@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Wie gut kennst du Anja? 🎉</title>
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Lato:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #D94820;
+      --red-dark: #b03a18;
+      --cream: #F5F0E6;
+      --cream-dark: #EDE8DC;
+      --text: #2a2218;
+      --green: #4CAF50;
+      --wrong: #c0392b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--cream-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      flex-direction: column;
+      background: var(--cream);
+    }
+    .screen.active { display: flex; }
+
+    /* ────────────────────────────────────────
+       START SCREEN
+    ──────────────────────────────────────── */
+    #start {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px;
+      text-align: center;
+      gap: 0;
+    }
+
+    .start-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .start-title {
+      font-family: 'Boogaloo', cursive;
+      font-size: 72px;
+      color: var(--red);
+      line-height: 0.9;
+      margin-bottom: 6px;
+    }
+
+    .start-sub {
+      font-family: 'Boogaloo', cursive;
+      font-size: 22px;
+      color: var(--red);
+      margin-bottom: 32px;
+    }
+
+    /* hands illustration */
+    .start-illustration {
+      width: 100%;
+      background: var(--cream-dark);
+      margin-bottom: 32px;
+    }
+
+    .start-desc {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+      margin-bottom: 32px;
+      max-width: 340px;
+    }
+
+    .start-desc strong {
+      color: var(--red);
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: var(--cream);
+      font-family: 'Boogaloo', cursive;
+      font-size: 26px;
+      letter-spacing: 2px;
+      border: none;
+      padding: 16px 48px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.15s, transform 0.1s;
+      text-transform: uppercase;
+    }
+    .btn-primary:active { background: var(--red-dark); transform: scale(0.97); }
+
+    /* ────────────────────────────────────────
+       QUIZ SCREEN
+    ──────────────────────────────────────── */
+    #quiz { padding: 0; justify-content: flex-start; }
+
+    /* top bar */
+    .quiz-top {
+      background: var(--red);
+      padding: 14px 20px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .q-counter {
+      font-family: 'Boogaloo', cursive;
+      font-size: 18px;
+      color: var(--cream);
+      letter-spacing: 1px;
+    }
+
+    .score-display {
+      font-family: 'Lato', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(245,240,230,0.8);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* timer bar */
+    .timer-wrap {
+      height: 6px;
+      background: rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+    .timer-bar {
+      height: 100%;
+      background: var(--cream);
+      width: 100%;
+      transition: width 0.1s linear;
+    }
+    .timer-bar.urgent { background: #ffd54f; }
+
+    /* question area */
+    .question-area {
+      padding: 28px 24px 20px;
+      flex-shrink: 0;
+    }
+
+    .question-emoji {
+      font-size: 36px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .question-text {
+      font-family: 'Lato', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* answers */
+    .answers {
+      padding: 0 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .answer-btn {
+      background: white;
+      border: 2px solid #ddd4c4;
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      font-size: 15px;
+      font-weight: 400;
+      padding: 16px 20px;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      line-height: 1.35;
+      min-height: 56px;
+    }
+    .answer-btn:active:not(:disabled) { transform: scale(0.98); }
+
+    .answer-btn.selected-correct {
+      background: #e8f5e9;
+      border-color: var(--green);
+      color: #1b5e20;
+      font-weight: 700;
+    }
+    .answer-btn.selected-wrong {
+      background: #ffebee;
+      border-color: var(--wrong);
+      color: var(--wrong);
+      font-weight: 700;
+      text-decoration: line-through;
+    }
+    .answer-btn.reveal-correct {
+      background: #e8f5e9;
+      border-color: var(--green);
+      color: #1b5e20;
+      font-weight: 700;
+    }
+    .answer-btn:disabled { cursor: default; }
+
+    /* feedback */
+    .feedback-bar {
+      margin: 0 16px 16px;
+      padding: 12px 16px;
+      border-radius: 2px;
+      font-size: 14px;
+      font-weight: 700;
+      display: none;
+    }
+    .feedback-bar.correct {
+      background: #e8f5e9;
+      color: #2e7d32;
+      display: block;
+    }
+    .feedback-bar.wrong {
+      background: #ffebee;
+      color: var(--wrong);
+      display: block;
+    }
+
+    /* progress dots */
+    .progress-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 16px 20px;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ddd4c4;
+      flex-shrink: 0;
+    }
+    .dot.done-correct { background: var(--green); }
+    .dot.done-wrong { background: var(--wrong); }
+    .dot.current { background: var(--red); }
+
+    /* ────────────────────────────────────────
+       RESULT SCREEN
+    ──────────────────────────────────────── */
+    #result {
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px;
+      text-align: center;
+      gap: 0;
+    }
+
+    .result-label {
+      font-family: 'Lato', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      color: var(--red);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .result-score {
+      font-family: 'Boogaloo', cursive;
+      font-size: 88px;
+      color: var(--red);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .result-outof {
+      font-family: 'Boogaloo', cursive;
+      font-size: 22px;
+      color: var(--red);
+      opacity: 0.7;
+      margin-bottom: 24px;
+    }
+
+    .result-border {
+      border: 1.5px solid var(--red);
+      padding: 18px 22px;
+      margin-bottom: 28px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .result-message {
+      font-family: 'Lato', sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text);
+    }
+
+    .result-share {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 16px;
+      font-style: italic;
+    }
+
+    .screenshot-hint {
+      background: var(--red);
+      color: var(--cream);
+      font-family: 'Lato', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      width: 100%;
+      max-width: 340px;
+      line-height: 1.5;
+    }
+
+    .screenshot-hint span {
+      font-size: 22px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--red);
+      font-family: 'Boogaloo', cursive;
+      font-size: 20px;
+      letter-spacing: 2px;
+      border: 2px solid var(--red);
+      padding: 12px 36px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.15s, color 0.15s;
+      text-transform: uppercase;
+    }
+    .btn-secondary:active { background: var(--red); color: var(--cream); }
+
+    /* confetti */
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      top: -10px;
+      opacity: 0;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      0%   { opacity: 1; transform: translateY(0) rotate(0deg); }
+      100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+    }
+
+    /* transition between questions */
+    .fade-out { animation: fadeOut 0.2s ease forwards; }
+    .fade-in  { animation: fadeIn  0.2s ease forwards; }
+    @keyframes fadeOut { to { opacity: 0; transform: translateY(-8px); } }
+    @keyframes fadeIn  { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════
+     START SCREEN
+═══════════════════════════════ -->
+<div id="start" class="screen active">
+  <div class="start-label">Gartenfest · 12. Juni 2026</div>
+  <div class="start-title">ANJA<br>WIRD 60</div>
+  <div class="start-sub">— Das Quiz —</div>
+
+  <!-- mini illustration -->
+  <div class="start-illustration">
+    <svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+      <rect width="480" height="160" fill="#EDE8DC"/>
+      <!-- three wine glasses as simple icons -->
+      <!-- Glass 1 -->
+      <g transform="translate(130,10)">
+        <line x1="22" y1="85" x2="22" y2="135" stroke="#D94820" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="8" y1="135" x2="36" y2="135" stroke="#D94820" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M5,10 Q0,45 4,58 Q10,72 22,74 Q34,72 40,58 Q44,45 39,10Z" fill="none" stroke="#D94820" stroke-width="2.5"/>
+        <path d="M5,10 Q8,40 22,46 Q36,40 39,10Z" fill="#D94820" opacity="0.45"/>
+      </g>
+      <!-- Glass 2 -->
+      <g transform="translate(214,5)">
+        <line x1="24" y1="90" x2="24" y2="140" stroke="#D94820" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="10" y1="140" x2="38" y2="140" stroke="#D94820" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M2,12 Q-3,50 2,65 Q10,80 24,82 Q38,80 46,65 Q51,50 46,12Z" fill="none" stroke="#D94820" stroke-width="2.5"/>
+        <path d="M2,12 Q6,46 24,52 Q42,46 46,12Z" fill="#D94820" opacity="0.6"/>
+        <line x1="10" y1="26" x2="8" y2="48" stroke="#EDE8DC" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+      </g>
+      <!-- Cocktail glass -->
+      <g transform="translate(302,8)">
+        <line x1="24" y1="78" x2="24" y2="130" stroke="#D94820" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="10" y1="130" x2="38" y2="130" stroke="#D94820" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M2,10 L46,10 L24,78Z" fill="none" stroke="#D94820" stroke-width="2.5"/>
+        <path d="M2,10 L46,10 L24,44Z" fill="#D94820" opacity="0.35"/>
+        <circle cx="44" cy="5" r="6" fill="#D94820" opacity="0.85"/>
+        <line x1="38" y1="5" x2="28" y2="10" stroke="#D94820" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <!-- anchor / police badge motif -->
+      <g transform="translate(32, 30)">
+        <circle cx="28" cy="28" r="26" fill="none" stroke="#D94820" stroke-width="2"/>
+        <circle cx="28" cy="28" r="18" fill="none" stroke="#D94820" stroke-width="1.5" opacity="0.5"/>
+        <text x="28" y="36" text-anchor="middle" font-family="Boogaloo, cursive" font-size="24" fill="#D94820" opacity="0.9">60</text>
+      </g>
+      <!-- flowers right -->
+      <g transform="translate(398,20)">
+        <line x1="28" y1="140" x2="28" y2="70" stroke="#7DAE7A" stroke-width="2" stroke-linecap="round"/>
+        <line x1="28" y1="140" x2="10" y2="90" stroke="#7DAE7A" stroke-width="2" stroke-linecap="round"/>
+        <line x1="28" y1="140" x2="46" y2="88" stroke="#7DAE7A" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="28" cy="60" r="10" fill="#D94820" opacity="0.85"/>
+        <circle cx="18" cy="55" r="7" fill="#D94820" opacity="0.6"/>
+        <circle cx="22" cy="46" r="7" fill="#D94820" opacity="0.6"/>
+        <circle cx="34" cy="44" r="7" fill="#D94820" opacity="0.6"/>
+        <circle cx="38" cy="54" r="7" fill="#D94820" opacity="0.6"/>
+        <circle cx="28" cy="60" r="4" fill="#EDE8DC"/>
+        <circle cx="10" cy="80" r="8" fill="#D94820" opacity="0.75"/>
+        <circle cx="3" cy="76" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="6" cy="68" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="15" cy="66" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="18" cy="74" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="10" cy="80" r="3.5" fill="#EDE8DC"/>
+        <circle cx="46" cy="78" r="8" fill="#D94820" opacity="0.75"/>
+        <circle cx="38" cy="74" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="42" cy="66" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="51" cy="64" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="55" cy="73" r="5.5" fill="#D94820" opacity="0.55"/>
+        <circle cx="46" cy="78" r="3.5" fill="#EDE8DC"/>
+      </g>
+      <text x="240" y="156" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="11" fill="#D94820" opacity="0.6">von Anja</text>
+    </svg>
+  </div>
+
+  <p class="start-desc">
+    12 Fragen über das Leben von Anja.<br>
+    Du hast <strong>20 Sekunden</strong> pro Frage.<br>
+    Wer kennt sie am besten?
+  </p>
+  <button class="btn-primary" onclick="startQuiz()">LOS GEHT'S!</button>
+</div>
+
+<!-- ═══════════════════════════════
+     QUIZ SCREEN
+═══════════════════════════════ -->
+<div id="quiz" class="screen">
+  <div class="quiz-top">
+    <div class="q-counter" id="q-counter">Frage 1 / 12</div>
+    <div class="score-display" id="score-display">0 Punkte</div>
+  </div>
+  <div class="timer-wrap">
+    <div class="timer-bar" id="timer-bar"></div>
+  </div>
+  <div class="question-area" id="question-area">
+    <span class="question-emoji" id="question-emoji">🎉</span>
+    <div class="question-text" id="question-text"></div>
+  </div>
+  <div class="answers" id="answers-area"></div>
+  <div class="feedback-bar" id="feedback-bar"></div>
+  <div class="progress-dots" id="progress-dots"></div>
+</div>
+
+<!-- ═══════════════════════════════
+     RESULT SCREEN
+═══════════════════════════════ -->
+<div id="result" class="screen">
+  <div class="result-label">Ergebnis</div>
+  <div class="result-score" id="result-score">0</div>
+  <div class="result-outof">von 14 Fragen richtig</div>
+  <div class="result-border">
+    <p class="result-message" id="result-message"></p>
+  </div>
+  <p class="result-share" id="result-share"></p>
+  <div class="screenshot-hint">
+    <span>📸</span>
+    Mach jetzt einen Screenshot —<br>gleich gibt's die Siegerehrung!
+  </div>
+  <button class="btn-primary" onclick="restartQuiz()" style="margin-bottom:16px;">NOCHMAL!</button>
+  <button class="btn-secondary" onclick="showStart()">ZUM START</button>
+</div>
+
+
+<script>
+  const questions = [
+    {
+      emoji: "💪",
+      question: "Was machte Anja nach der Geburt ihres ersten Kindes?",
+      answers: ["Lange Elternzeit", "Umzug ins Ausland", "Neues Studium begonnen", "Schnell zurück in den Dienst"],
+      correct: 3,
+      funfact: "Schnell zurück in den Dienst! Anja ist eine Powerfrau — das war schon immer so."
+    },
+    {
+      emoji: "🐶",
+      question: "Wie wurde Anjas Hund noch NIE genannt?",
+      answers: ["Miro", "Mirko", "Kackbratze", "Wuffi"],
+      correct: 3,
+      funfact: "Wuffi nicht — aber Miro, Mirko und Kackbratze schon. Jeder Hund hat viele Namen. 😄"
+    },
+    {
+      emoji: "😅",
+      question: "Was kann Anja auf keinen Fall?",
+      answers: ["Filigrane Häkeltiere häkeln", "Klamotten nähen", "Franzbrötchen backen", "Sich aus Diskussionen raushalten"],
+      correct: 3,
+      funfact: "Sich aus Diskussionen raushalten! Anja hat immer eine Meinung — und die teilt sie auch. 😄"
+    },
+    {
+      emoji: "👜",
+      question: "Was hat Anja VOR ihrer Polizeikarriere gelernt?",
+      answers: ["Friseurin", "Krankenschwester", "Kauffrau", "Lehrerin"],
+      correct: 2,
+      funfact: "Kauffrau! Erst danach entschied sie sich für die Polizei — eine mutige Umorientierung."
+    },
+    {
+      emoji: "🚔",
+      question: "Wo sammelte Anja ihre allerersten Erfahrungen als Polizistin?",
+      answers: ["Hamburg Reeperbahn", "Hamburg Hauptbahnhof", "Hamburg Flughafen", "Hamburg Altona"],
+      correct: 1,
+      funfact: "Richtig — Hamburg Hauptbahnhof. Einer der belebtesten Bahnhöfe Deutschlands. Gleich ins kalte Wasser!"
+    },
+    {
+      emoji: "🍷",
+      question: "In welcher Stadt erlebten Anja & Daggi ein legendäres Wochenende?",
+      answers: ["München", "Köln", "Trier", "Berlin"],
+      correct: 2,
+      funfact: "Trier! Was dort passiert ist, bleibt in Trier. Oder auch nicht... 😄"
+    },
+    {
+      emoji: "🕵️",
+      question: "Was verkaufte Anja auf der Internorga?",
+      answers: ["Käse", "Fisch", "Bier", "Wein"],
+      correct: 3,
+      funfact: "Wein! Anjas schwierigste Undercover-Mission oder ihre angenehmste? 🍷"
+    },
+    {
+      emoji: "📺",
+      question: "Bei welcher TV-Sendung war Anja zu sehen?",
+      answers: ["Aktenzeichen XY", "Spiegel TV", "RTL Explosiv", "Stern TV"],
+      correct: 1,
+      funfact: "Spiegel TV! Anja war im echten Fernsehen. Ein Star unter uns!"
+    },
+    {
+      emoji: "⚓",
+      question: "Welchen Job hatte Anja auf dem Wasser?",
+      answers: ["Stewardess auf einem Kreuzfahrtschiff", "Trommlerin auf einem Drachenboot", "Vorschoterin auf einem Hobi", "Kellnerin auf einer Barkasse"],
+      correct: 2,
+      funfact: "Vorschoterin auf einem Hobi! Ein Hobie Cat ist ein Katamaran — und Anja war mittendrin statt nur dabei."
+    },
+    {
+      emoji: "💍",
+      question: "Was ist bei Anjas Hochzeit NICHT passiert?",
+      answers: ["Luc wurde getauft", "Die Fotografin hat genervt", "Die Sonne hat geschienen", "Die Schwiegermutter ist in Tränen ausgebrochen"],
+      correct: 3,
+      funfact: "Die Schwiegermutter blieb tränenfrei! Luc wurde getauft, die Sonne schien — und die Fotografin... na ja. 😄"
+    },
+    {
+      emoji: "🔍",
+      question: "Bei welcher Abteilung hat Anja als Ermittlerin gearbeitet?",
+      answers: ["Sittenpolizei", "Staatsschutz", "Verkehrspolizei", "Mordkommission"],
+      correct: 3,
+      funfact: "Mordkommission! Anja löst die härtesten Fälle. Respekt."
+    },
+    {
+      emoji: "🎭",
+      question: "Welche Tätigkeit hat Anja nie ausgeübt?",
+      answers: ["Verdeckte Ermittlerin", "Chauffeurin auf dem Weltwirtschaftsforum", "Stylistin", "Fahrtraining auf dem Nürburgring"],
+      correct: 2,
+      funfact: "Stylistin nie — aber verdeckte Ermittlerin, Chauffeurin auf dem Weltwirtschaftsforum und Fahrtraining auf dem Nürburgring: alles wahr! 🤯"
+    },
+    {
+      emoji: "🙈",
+      question: "Mit was kann Anja nicht gut umgehen?",
+      answers: ["Freunde", "Geld", "Thermomix", "Tiere"],
+      correct: 1,
+      funfact: "Geld! Wer braucht schon einen Sparplan, wenn man so viele Freunde hat? 😄"
+    },
+    {
+      emoji: "💇",
+      question: "Welche Haarfarbe hatte Anja, bevor sie grau wurde?",
+      answers: ["Braun", "Hell-Blond", "Schwarz", "Straßenköterblond"],
+      correct: 3,
+      funfact: "Straßenköterblond! Eine sehr präzise Eigendiagnose. 😄"
+    },
+  ];
+
+  const messages = [
+    { min: 14, max: 14, text: "🏆 PERFEKT! Du kennst Anja besser als sie sich selbst! Sherlock Holmes hätte das nicht besser gemacht." },
+    { min: 11, max: 13, text: "🌟 Ausgezeichnet! Du warst eindeutig öfter beim Kaffeeklatsch dabei. Fast perfekt!" },
+    { min: 7,  max: 9,  text: "👏 Sehr gut! Du kennst Anjas Leben schon ziemlich gut — aber ein paar Geheimnisse hat sie noch." },
+    { min: 4,  max: 6,  text: "😄 Solide! Du kennst Anja, aber heute Abend wirst du noch einiges über sie lernen!" },
+    { min: 0,  max: 3,  text: "😂 Na ja... Aber gut, dass du heute hier bist! Anja freut sich trotzdem riesig über dich!" }
+  ];
+
+  let currentQ = 0;
+  let score = 0;
+  let answered = false;
+  let timerInterval = null;
+  let timeLeft = 20;
+  const TIMER_DURATION = 20;
+  let dotStates = [];
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function startQuiz() {
+    currentQ = 0;
+    score = 0;
+    dotStates = new Array(questions.length).fill('pending');
+    showScreen('quiz');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    answered = false;
+    timeLeft = TIMER_DURATION;
+
+    const q = questions[currentQ];
+
+    // counter & score
+    document.getElementById('q-counter').textContent = `Frage ${currentQ + 1} / ${questions.length}`;
+    document.getElementById('score-display').textContent = `${score} Punkt${score !== 1 ? 'e' : ''}`;
+
+    // question
+    const qArea = document.getElementById('question-area');
+    qArea.classList.remove('fade-in');
+    void qArea.offsetWidth;
+    qArea.classList.add('fade-in');
+
+    document.getElementById('question-emoji').textContent = q.emoji;
+    document.getElementById('question-text').textContent = q.question;
+
+    // answers
+    const area = document.getElementById('answers-area');
+    area.innerHTML = '';
+    area.classList.remove('fade-in');
+    void area.offsetWidth;
+    area.classList.add('fade-in');
+
+    q.answers.forEach((ans, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'answer-btn';
+      btn.textContent = ans;
+      btn.onclick = () => handleAnswer(i);
+      area.appendChild(btn);
+    });
+
+    // feedback
+    const fb = document.getElementById('feedback-bar');
+    fb.className = 'feedback-bar';
+    fb.textContent = '';
+
+    // dots
+    renderDots();
+
+    // timer
+    clearInterval(timerInterval);
+    updateTimerBar(1);
+    timerInterval = setInterval(() => {
+      timeLeft -= 0.1;
+      const ratio = timeLeft / TIMER_DURATION;
+      updateTimerBar(ratio);
+      const bar = document.getElementById('timer-bar');
+      if (timeLeft <= 6) bar.classList.add('urgent');
+      else bar.classList.remove('urgent');
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (!answered) {
+          timeExpired();
+        }
+      }
+    }, 100);
+  }
+
+  function updateTimerBar(ratio) {
+    const bar = document.getElementById('timer-bar');
+    bar.style.width = Math.max(0, ratio * 100) + '%';
+  }
+
+  function handleAnswer(idx) {
+    if (answered) return;
+    answered = true;
+    clearInterval(timerInterval);
+
+    const q = questions[currentQ];
+    const btns = document.querySelectorAll('.answer-btn');
+    btns.forEach(b => b.disabled = true);
+
+    const fb = document.getElementById('feedback-bar');
+
+    if (idx === q.correct) {
+      score++;
+      btns[idx].classList.add('selected-correct');
+      fb.className = 'feedback-bar correct';
+      fb.textContent = '✓ Richtig! ' + q.funfact;
+      dotStates[currentQ] = 'correct';
+    } else {
+      btns[idx].classList.add('selected-wrong');
+      btns[q.correct].classList.add('reveal-correct');
+      fb.className = 'feedback-bar wrong';
+      fb.textContent = '✗ Leider falsch. ' + q.funfact;
+      dotStates[currentQ] = 'wrong';
+    }
+
+    renderDots();
+    document.getElementById('score-display').textContent = `${score} Punkt${score !== 1 ? 'e' : ''}`;
+
+    setTimeout(() => nextQuestion(), 2200);
+  }
+
+  function timeExpired() {
+    answered = true;
+    const q = questions[currentQ];
+    const btns = document.querySelectorAll('.answer-btn');
+    btns.forEach(b => b.disabled = true);
+    btns[q.correct].classList.add('reveal-correct');
+    const fb = document.getElementById('feedback-bar');
+    fb.className = 'feedback-bar wrong';
+    fb.textContent = '⏱ Zeit abgelaufen! ' + q.funfact;
+    dotStates[currentQ] = 'wrong';
+    renderDots();
+    setTimeout(() => nextQuestion(), 2200);
+  }
+
+  function nextQuestion() {
+    currentQ++;
+    if (currentQ >= questions.length) {
+      showResult();
+    } else {
+      renderQuestion();
+    }
+  }
+
+  function renderDots() {
+    const container = document.getElementById('progress-dots');
+    container.innerHTML = '';
+    questions.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot';
+      if (i < currentQ) {
+        dot.classList.add(dotStates[i] === 'correct' ? 'done-correct' : 'done-wrong');
+      } else if (i === currentQ) {
+        dot.classList.add('current');
+      }
+      container.appendChild(dot);
+    });
+  }
+
+  function showResult() {
+    showScreen('result');
+    document.getElementById('result-score').textContent = score;
+
+    const msg = messages.find(m => score >= m.min && score <= m.max);
+    document.getElementById('result-message').textContent = msg ? msg.text : '';
+
+    // compare text
+    const shareTexts = [
+      "Vergleich dein Ergebnis mit den anderen — wer kennt Anja am besten?",
+      "Sag deinen Tischnachbarn, wie viele du hattest!",
+      "Schreib deinen Score auf einen Zettel — am Ende wird verglichen!"
+    ];
+    document.getElementById('result-share').textContent =
+      score >= 10 ? "🎉 " + shareTexts[0] : shareTexts[Math.floor(Math.random() * shareTexts.length)];
+
+    // confetti for good scores
+    if (score >= 8) launchConfetti();
+  }
+
+  function launchConfetti() {
+    const colors = ['#D94820', '#E8A86A', '#7DAE7A', '#F5F0E6', '#ffd54f'];
+    for (let i = 0; i < 60; i++) {
+      setTimeout(() => {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (6 + Math.random() * 8) + 'px';
+        piece.style.height = (6 + Math.random() * 8) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        piece.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        piece.style.animationDelay = '0s';
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 4000);
+      }, i * 40);
+    }
+  }
+
+  function restartQuiz() {
+    startQuiz();
+  }
+
+  function showStart() {
+    clearInterval(timerInterval);
+    showScreen('start');
+  }
+</script>
+
+</body>
+</html>
